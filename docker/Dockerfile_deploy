@@ -1,0 +1,32 @@
+FROM ros:humble-ros-base
+
+# Set up the workspace
+WORKDIR /ros_ws
+
+# Install build dependencies and build the workspace
+RUN --mount=type=bind,target=/ros_ws/src,source=src \
+    apt-get update && \
+    rosdep update && \
+    rosdep install --from-paths src --ignore-src --rosdistro humble -y && \
+    . /opt/ros/humble/setup.sh && \
+    colcon build --cmake-args -DBUILD_TESTING=OFF && \
+    rm -rf /ros_ws/build /ros_ws/log && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install runtime dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    tmuxinator \
+    wget && \
+    rm -rf /var/lib/apt/lists/* && \
+    wget -qO /usr/local/bin/yq https://github.com/mikefarah/yq/releases/latest/download/yq_linux_amd64 && \
+    chmod a+x /usr/local/bin/yq
+
+# Copy the entrypoint script
+COPY ros_entrypoint.sh /
+
+# Ensure the entrypoint script is executable
+RUN chmod +x /ros_entrypoint.sh
+
+# Set the entrypoint
+ENTRYPOINT ["/ros_entrypoint.sh"]

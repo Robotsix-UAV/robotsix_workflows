@@ -1,0 +1,85 @@
+name: Deploy Docker Image
+
+permissions:
+  packages: write
+  contents: read
+  attestations: write
+
+on:
+  workflow_call:
+    secrets:
+      MY_GITHUB_TOKEN:
+        required: true
+      DOCKER_USERNAME:
+        required: true
+      DOCKER_TOKEN:
+        required: true
+    inputs:
+      docker-repo:
+        description: 'Docker repository push to'
+        type: string
+        required: true
+
+jobs:
+  build_docker:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install python3-pip docker
+
+      - name: Install python dependencies
+        run: |
+          sudo pip install -U rosdep
+          pip install vcstool
+
+      - name: Create the src dir
+        run: |
+          mkdir -p ${{ github.workspace }}/src/${{ github.event.repository.name }}
+
+      - name: Checkout the repository
+        uses: actions/checkout@v4
+        with:
+          path: src/${{ github.event.repository.name }}/
+
+      - name: Parse dependencies.repos and insert token
+        env:
+          GH_TOKEN: ${{ secrets.MY_GITHUB_TOKEN }}
+        run: |
+          if [ -f src/${{ github.event.repository.name }}/dependencies.repos ]; then
+            sed -i "s|https://|https://${GH_TOKEN}@|g" src/${{ github.event.repository.name }}/dependencies.repos
+          fi
+
+      - name: Install dependencies with vcs
+        run: |
+          if [ -f src/${{ github.event.repository.name }}/dependencies.repos ]; then
+            vcs import src < src/${{ github.event.repository.name }}/dependencies.repos
+          fi
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@f4ef78c080cd8ba55a85445d5b36e214a81df20a
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_TOKEN }}
+
+      - name: Extract metadata (tags, labels) for Docker
+        id: meta
+        uses: docker/metadata-action@9ec57ed1fcdbf14dcef7dfbe97b2010124a938b7
+        with:
+          images: robotsix/${{ inputs.docker-repo }}
+
+      - name: Get Dockerfile
+        run: |
+          wget https://raw.githubusercontent.com/Robotsix-UAV/robotsix_workflows/main/docker/Dockerfile_deploy
+          wget https://raw.githubusercontent.com/Robotsix-UAV/robotsix_workflows/main/docker/ros_entrypoint.sh
+
+      - name: Build and push Docker image
+        id: push
+        uses: docker/build-push-action@3b5e8027fcad23fda98b2e3ac259d8d67585f671
+        with:
+          context: .
+          file: ./Dockerfile_deploy
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
