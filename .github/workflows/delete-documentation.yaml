@@ -18,7 +18,7 @@ jobs:
           python-version: 3.x
       - name: Delete with mike
         run: |
-          pip install mike
+          pip install mike python-markdown-math
           git config --local user.name robotsix_bot
           git config --local user.email robotsix_bot@noreply.com
           git fetch origin gh-pages --depth=1
