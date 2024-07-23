@@ -32,7 +32,7 @@ jobs:
       - name: Install python dependencies
         run: |
           sudo pip install -U rosdep
-          pip install colcon-common-extensions colcon-lcov-result vcstool mike
+          pip install colcon-common-extensions colcon-lcov-result vcstool mike python-markdown-math
 
       - name: Create the src dir
         run: |
