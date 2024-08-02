@@ -27,7 +27,17 @@ jobs:
       - name: Install dependencies
         run: |
           sudo apt-get update
-          sudo apt-get install -y lcov doxygen graphviz python3-pip
+          sudo apt-get install -y lcov graphviz python3-pip
+
+      - name: Install doxygen
+        run: |
+          wget https://github.com/doxygen/doxygen/releases/download/Release_1_11_0/doxygen-1.11.0.linux.bin.tar.gz
+          tar -xzf doxygen-1.11.0.linux.bin.tar.gz
+          cd doxygen-1.11.0
+          sudo make
+          sudo make install
+          cd ..
+          sudo rm -rf doxygen-1.11.0 doxygen-1.11.0.linux.bin.tar.gz
 
       - name: Install python dependencies
         run: |
@@ -112,6 +122,45 @@ jobs:
           pip install .
           cd ${{ github.workspace }}
           rosdoc2 build -p ${{ github.workspace }}/src/${{ github.event.repository.name }}
+          cp /home/runner/work/${{ github.event.repository.name }}/${{ github.event.repository.name }}/docs_build/${{ github.event.repository.name }}/${{ github.event.repository.name }}-public-cc-api/doxygen-warnings.log . || true
+
+      - name: Display doxygen warnings
+        run: |
+          if [ -f doxygen-warnings.log ]; then
+            cat doxygen-warnings.log
+          fi
+
+      - name: Parse and Comment on Pull Request
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v5
+        with:
+          script: |
+            const fs = require('fs');
+            const path = 'doxygen-warnings.log';
+
+            // Check if the log file exists and is not empty
+            if (fs.existsSync(path) && fs.statSync(path).size > 0) {
+              const warnings = fs.readFileSync(path, 'utf8').trim().split('\n');
+              let commentBody = "### :warning: Doxygen Warnings Found\n";
+              commentBody += "Here are the details of the warnings:\n```\n";
+
+              warnings.forEach(warning => {
+                commentBody += `${warning}\n`;
+              });
+
+              commentBody += "```\nPlease review the warnings and make necessary changes.";
+
+              // Create a comment on the PR
+              console.log('Posting comment with Doxygen warnings');
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number, // This assumes the action is triggered by a pull_request event
+                body: commentBody
+              });
+            } else {
+              console.log('No Doxygen warnings log file found or the file is empty.');
+            }
 
       - name: Clone and checkout gh-pages branch
         uses: actions/checkout@v4
