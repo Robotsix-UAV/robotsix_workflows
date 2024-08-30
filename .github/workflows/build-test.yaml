@@ -87,6 +87,12 @@ jobs:
             vcs import src < src/${{ github.event.repository.name }}/dependencies.repos
           fi
 
+      - name: Install requirements from python-requirements.txt
+        run: |
+          if [ -f src/${{ github.event.repository.name }}/python-requirements.txt ]; then
+            pip install -r src/${{ github.event.repository.name }}/python-requirements.txt
+          fi
+
       - name: Install dependencies with rosdep
         run: |
           sudo apt update && sudo apt install curl -y
@@ -107,7 +113,7 @@ jobs:
           source /opt/ros/humble/setup.bash
           colcon lcov-result --initial --packages-select ${{ github.event.repository.name }}
           colcon test --event-handlers console_direct+ --packages-select ${{ github.event.repository.name }} --return-code-on-test-failure
-          echo -e "geninfo_auto_base=1\ngenhtml_num_spaces = 2\ngenhtml_legend = 1\ngenhtml_function_coverage = 0\ngenhtml_branch_coverage = 0\ngeninfo_external = 0\nstop_on_error = 0\nlcov_quiet = 1\nlcov_function_coverage = 0\nlcov_branch_coverage = 0\nlcov_follow = 1" > ${{ github.workspace }}/lcovrc
+          echo -e "geninfo_auto_base=1\ngenhtml_num_spaces = 2\ngenhtml_legend = 1\ngenhtml_function_coverage = 0\ngenhtml_branch_coverage = 0\ngeninfo_external = 0\nstop_on_error = 0\nlcov_quiet = 1\nlcov_function_coverage = 0\nbranch_coverage = 0\nlcov_follow = 1\nignore_errors_missing" > ${{ github.workspace }}/lcovrc
           colcon lcov-result --filter */test/* --packages-select ${{ github.event.repository.name }} --lcov-config-file ${{ github.workspace }}/lcovrc
 
       - name: Get documentation directory for deployment
