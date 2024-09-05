@@ -12,6 +12,12 @@ RUN apt-get update && \
     update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-13 100 && \
     rm -rf /var/lib/apt/lists/*
 
+# Install pip
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    python3-pip && \
+    rm -rf /var/lib/apt/lists/*
+
 # Set up the workspace
 WORKDIR /ros_ws
 
