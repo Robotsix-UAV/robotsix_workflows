@@ -69,10 +69,11 @@ jobs:
         with:
           images: robotsix/${{ inputs.docker-repo }}
 
-      - name: Get Dockerfile
+      - name: Get Dockerfile and copy python requirements file
         run: |
           wget https://raw.githubusercontent.com/Robotsix-UAV/robotsix_workflows/main/docker/Dockerfile_deploy
           wget https://raw.githubusercontent.com/Robotsix-UAV/robotsix_workflows/main/docker/ros_entrypoint.sh
+          cp src/${{ github.event.repository.name }}/python-requirements.txt .
 
       - name: Build and push Docker image
         id: push
