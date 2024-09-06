@@ -19,6 +19,10 @@ on:
         description: 'Docker repository push to'
         type: string
         required: true
+      architectures:
+        description: 'Target architectures for the Docker build (e.g., linux/amd64, linux/arm64)'
+        type: string
+        default: 'linux/amd64'
 
 jobs:
   build_docker:
@@ -84,3 +88,4 @@ jobs:
           push: true
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
+          platforms: ${{ github.event.inputs.architecture }}
