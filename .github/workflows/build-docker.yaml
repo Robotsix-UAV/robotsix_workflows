@@ -73,11 +73,13 @@ jobs:
         with:
           images: robotsix/${{ inputs.docker-repo }}
 
-      - name: Get Dockerfile and copy python requirements file
+      - name: Get Dockerfile and copy python requirements file (if exists)
         run: |
           wget https://raw.githubusercontent.com/Robotsix-UAV/robotsix_workflows/main/docker/Dockerfile_deploy
           wget https://raw.githubusercontent.com/Robotsix-UAV/robotsix_workflows/main/docker/ros_entrypoint.sh
-          cp src/${{ github.event.repository.name }}/python-requirements.txt .
+          if [ -f src/${{ github.event.repository.name }}/python-requirements.txt ]
+            then cp src/${{ github.event.repository.name }}/python-requirements.txt .
+          fi
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
