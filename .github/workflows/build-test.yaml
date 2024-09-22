@@ -238,6 +238,13 @@ jobs:
           python3 lcov-badger/lcov-badger.py ${{ github.event.repository.name }}/${{ env.DEPLOY_REF }}/lcov/total_coverage.info ${{ github.event.repository.name }}/${{ env.DEPLOY_REF }}/lcov/badge.svg
           fi
 
+      - name: Upload Coverage Info as Artifact
+        if: ${{ inputs.generate_coverage }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: coverage-info
+          path: ${{ github.workspace }}/lcov/total_coverage.info
+
       - name: Copy generated documentation
         run: |
           cd ${{ github.event.repository.name }}
