@@ -2,6 +2,7 @@ import os
 import sys
 from openai import OpenAI
 from utils import get_assistant_configuration
+from assistant_functions import execute_shell_command_tool
 
 def main():
     # Set your OpenAI API key
@@ -16,7 +17,7 @@ def main():
     # Update the assistant by adding tools
     response = client.beta.assistants.update(
         assistant_id=assistant_id,
-        tools=[{"type": "code_interpreter"}, {"type": "file_search"}],
+        tools=[{"type": "code_interpreter"}, {"type": "file_search"}, execute_shell_command_tool],
         tool_resources={"file_search": {"vector_store_ids": [vector_store_id]}})
 
     # Optional: Handle the response as needed
