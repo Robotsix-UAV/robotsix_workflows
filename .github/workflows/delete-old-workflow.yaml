@@ -2,6 +2,7 @@ name: Delete old workflow
 
 on:
   workflow_call:
+  workflow_dispatch:
 
 jobs:
   del_runs:
