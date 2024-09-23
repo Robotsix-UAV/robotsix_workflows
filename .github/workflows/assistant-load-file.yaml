@@ -1,4 +1,4 @@
-name: Generate Repo Structure and Load Files
+name: Load Files into Assistant
 
 on:
   workflow_dispatch:
@@ -26,10 +26,9 @@ jobs:
       run: |
         python tools/generate_repo_structure.py . > repo_structure.txt
 
-    - name: Clean current assistant
+    - name: Clean current assistant and load files
+      env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       run: |
         python tools/clean_assistant_files.py
-
-    - name: Load Files into Assistant
-      run: |
         python tools/load_files_assistant.py .
