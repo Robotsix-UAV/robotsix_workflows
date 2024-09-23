@@ -30,6 +30,7 @@ jobs:
           OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
         run: |
           python tools/create_assistant.py
+          python tools/configure_assistant.py
 
       - name: Commit Changes
         run: |

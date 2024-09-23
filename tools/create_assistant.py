@@ -31,9 +31,16 @@ response = client.beta.assistants.create(
 # Extract the assistant ID
 assistant_id = response.id
 
+# Create a vector store for the repository files
+vector_store = client.beta.vector_stores.create(name=f"{repo_name} Files")
+
+# Extract the vector store ID
+vector_store_id = vector_store.id
+
 # Save the assistant ID to a JSON configuration file
 config = {
-    "assistant_id": assistant_id
+    "assistant_id": assistant_id,
+    "vector_store_id": vector_store_id,
 }
 
 with open('assistant_config.json', 'w') as f:
