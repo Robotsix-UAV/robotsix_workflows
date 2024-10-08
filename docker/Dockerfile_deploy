@@ -26,7 +26,7 @@ RUN if [ -f /python-requirements.txt ]; then pip3 install --no-cache-dir -r /pyt
 WORKDIR /ros_ws
 
 # Copy the source code into the workspace
-COPY src/ ros_ws/src/
+COPY src/ .
 
 # Install build dependencies and build the workspace
 RUN apt-get update && \
