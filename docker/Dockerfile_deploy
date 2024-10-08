@@ -25,14 +25,15 @@ RUN if [ -f /python-requirements.txt ]; then pip3 install --no-cache-dir -r /pyt
 # Set up the workspace
 WORKDIR /ros_ws
 
+# Copy the source code into the workspace
+COPY src/ ros_ws/src/
+
 # Install build dependencies and build the workspace
-RUN --mount=type=bind,target=/ros_ws/src,source=src \
-    apt-get update && \
+RUN apt-get update && \
     rosdep update && \
     rosdep install --from-paths src --ignore-src --rosdistro humble -y && \
     . /opt/ros/humble/setup.sh && \
     colcon build --cmake-args -DBUILD_TESTING=OFF && \
-    rm -rf /ros_ws/build /ros_ws/log && \
     rm -rf /var/lib/apt/lists/*
 
 # Install runtime dependencies
