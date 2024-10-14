@@ -27,7 +27,7 @@ jobs:
           onlyRemoveDeployments: true
 
   test_and_documentation:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     needs: cleanup
     steps:
       - name: Setup python
