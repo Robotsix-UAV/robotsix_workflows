@@ -30,6 +30,10 @@ jobs:
     runs-on: ubuntu-latest
     needs: cleanup
     steps:
+      - name: Setup python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
       - name: Install gcc13 and g++13
         run: |
           sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y
