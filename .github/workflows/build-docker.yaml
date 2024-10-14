@@ -26,7 +26,7 @@ on:
 
 jobs:
   build_docker:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Setup python
         uses: actions/setup-python@v5

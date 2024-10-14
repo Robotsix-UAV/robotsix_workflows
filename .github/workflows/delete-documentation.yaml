@@ -9,7 +9,7 @@ permissions:
 jobs:
   delete-documentation:
     name: Delete Mkdocs Documentation
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-22.04
     steps:
       - name: Checkout the repository
         uses: actions/checkout@v4
